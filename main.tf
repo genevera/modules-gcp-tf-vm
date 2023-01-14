@@ -11,28 +11,28 @@ resource "random_pet" "vm_name" {
 
 resource "google_compute_instance" "compute_instance" {
   name           = random_pet.vm_name.id
-  machine_type   = "n1-standard-8"
+  machine_type   = var.machine_type
   zone           = var.main_availability_zone
   can_ip_forward = true
 
   scheduling {
     preemptible                 = true
     automatic_restart           = false
-    provisioning_model          = "SPOT"
-    instance_termination_action = "STOP"
+    provisioning_model          = var.provisioning_model
+    instance_termination_action = var.instance_termination_action
   }
 
   guest_accelerator {
-    type  = "nvidia-tesla-v100"
-    count = 1
+    type  = var.guest_accelerator
+    count = var.guest_accelerator_count
   }
 
   boot_disk {
     # kms_key_self_link = module.gcp-tf-base.google_kms_crypto_key_id
     initialize_params {
-      image = "ubuntu-os-cloud/ubuntu-2204-lts"
-      type  = "pd-ssd"
-      size  = 64
+      image = var.os_image
+      type  = var.disk_type
+      size  = var.disk_size
     }
   }
 
